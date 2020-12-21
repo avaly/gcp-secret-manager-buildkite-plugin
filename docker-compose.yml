@@ -1,0 +1,18 @@
+version: '2'
+services:
+  tests:
+    image: buildkite/plugin-tester
+    volumes:
+      - ".:/plugin:ro"
+
+  lint:
+    image: buildkite/plugin-linter
+    command: ['--id', 'avaly/gcp-secret-manager']
+    volumes:
+      - ".:/plugin:ro"
+
+  shellcheck:
+    image: koalaman/shellcheck-alpine:latest
+    command: ['shellcheck', '/plugin/hooks/environment']
+    volumes:
+      - ".:/plugin:ro"

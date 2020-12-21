@@ -1,0 +1,15 @@
+steps:
+  - label: ":shell: Shellcheck"
+    plugins:
+      shellcheck#v1.1.2:
+        files: hooks/**
+
+  - label: ":sparkles:"
+    plugins:
+      plugin-linter#v2.0.0:
+        id: avaly/gcp-secret-manager
+
+  - label: ":docker: :hammer:"
+    plugins:
+      docker-compose#v3.7.0:
+        run: tests
