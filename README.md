@@ -1,13 +1,15 @@
 # GCP Secret Manager Buildkite Plugin
 
-Use secrets from GCP Secret Manager in your environment variables.
+[![GitHub Release](https://img.shields.io/github/release/avaly/gcp-secret-manager-buildkite-plugin.svg)](https://github.com/avaly/gcp-secret-manager-buildkite-plugin/releases) [![Build status](https://badge.buildkite.com/2d6dda24352064bc947c7affb868734d615bafeecb22102007.svg?branch=master)]()
+
+A [Buildkite plugin](https://buildkite.com/docs/agent/v3/plugins) to read secrets from [GCP Secret Manager](https://cloud.google.com/secret-manager).
 
 This plugin requires a Google Cloud credentials file to be available on your Buildkite Agent machines.
 
 Other preinstalled requirements:
 
-- `gcloud`
-- `jq`
+- [`gcloud`](https://cloud.google.com/sdk/)
+- [`jq`](https://stedolan.github.io/jq/)
 
 ## Example
 
