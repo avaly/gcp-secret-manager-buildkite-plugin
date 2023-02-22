@@ -4,7 +4,8 @@
 
 A [Buildkite plugin](https://buildkite.com/docs/agent/v3/plugins) to read secrets from [GCP Secret Manager](https://cloud.google.com/secret-manager).
 
-This plugin requires a Google Cloud credentials file to be available on your Buildkite Agent machines.
+This plugin requires either a Google Cloud credentials file or application default credentials to be available on your
+Buildkite Agent machines.
 
 Other preinstalled requirements:
 
@@ -28,9 +29,11 @@ steps:
 
 ## Configuration
 
-### `credentials_file` (Required, string)
+### `credentials_file` (Optional, string)
 
-The file path of a Google Cloud credentials file, which is used to access the secrets. The account of the credentials file needs to have the Secret Manager Secret Accessor role (`roles/secretmanager.secretAccessor`).
+The file path of a Google Cloud [credentials file][1] which is used to access the secrets. If not specified, the
+[application default credential][2] will be searched for and used if available.  The account credential must have the
+Secret Accessor role for the secret being accessed (`roles/secretmanager.secretAccessor`).
 
 ### `env` (object)
 
@@ -52,3 +55,6 @@ docker-compose run --rm tests
 3. Run the tests
 4. Commit and push your changes
 5. Send a pull request
+
+[1]: https://developers.google.com/workspace/guides/create-credentials#create_credentials_for_a_service_account
+[2]: https://cloud.google.com/docs/authentication/application-default-credentials
