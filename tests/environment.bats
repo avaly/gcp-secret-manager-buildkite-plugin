@@ -1,6 +1,11 @@
 #!/usr/bin/env bats
 
-load "$BATS_PATH/load.bash"
+setup() {
+  load "$BATS_PLUGIN_PATH/load.bash"
+
+  # Uncomment to enable stub debugging
+  # export GIT_STUB_DEBUG=/dev/tty
+}
 
 environment_hook="$PWD/hooks/environment"
 
