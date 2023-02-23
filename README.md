@@ -20,7 +20,7 @@ Add the following to your `pipeline.yml`:
 steps:
   - command: 'echo \$SECRET_VAR'
     plugins:
-      - avaly/gcp-secret-manager#v1.0.0:
+      - avaly/gcp-secret-manager#v1.1.0:
           credentials_file: /etc/gcloud-credentials.json
           env:
             SECRET_VAR: my-secret-name
@@ -29,7 +29,7 @@ steps:
 
 ## Configuration
 
-### `credentials_file` (Optional, string)
+### `credentials_file` (optional, string)
 
 The file path of a Google Cloud [credentials file][1] which is used to access the secrets. If not specified, the
 [application default credential][2] will be searched for and used if available.  The account credential must have the
