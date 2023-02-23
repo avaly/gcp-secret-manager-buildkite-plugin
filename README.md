@@ -20,7 +20,7 @@ Add the following to your `pipeline.yml`:
 steps:
   - command: 'echo \$SECRET_VAR'
     plugins:
-      - avaly/gcp-secret-manager#v1.1.0:
+      - avaly/gcp-secret-manager#v1.1.1:
           credentials_file: /etc/gcloud-credentials.json
           env:
             SECRET_VAR: my-secret-name
