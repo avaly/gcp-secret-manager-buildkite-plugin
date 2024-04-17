@@ -77,6 +77,8 @@ function strip_quotes() {
   echo "${1}" | sed "s/^[[:blank:]]*//g;s/[[:blank:]]*$//g;s/[\"']//g"
 }
 
+echo "Fetching secrets..."
+
 # Parse env items
 while IFS='=' read -r name _ ; do
   if [[ $name =~ ^(BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_) ]] ; then
