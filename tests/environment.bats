@@ -18,10 +18,8 @@ teardown() {
 
 function stub_gcloud_secrets() {
   stub gcloud \
-    "secrets versions list secret1 --format=json : echo '[{\"name\":\"secret1/versions/10\"}]'" \
-    "secrets versions access 10 --secret=secret1 '--format=get(payload.data)' : echo 'dGVzdC12YWx1ZTEK'" \
-    "secrets versions list secret2 --format=json : echo '[{\"name\":\"secret2/versions/11\"}]'" \
-    "secrets versions access 11 --secret=secret2 '--format=get(payload.data)' : echo 'dGVzdC12YWx1ZTI='"
+    "secrets versions access latest --secret=secret1 '--format=get(payload.data)' : echo 'dGVzdC12YWx1ZTEK'" \
+    "secrets versions access latest --secret=secret2 '--format=get(payload.data)' : echo 'dGVzdC12YWx1ZTI='"
 }
 
 environment_hook="$PWD/hooks/environment"
