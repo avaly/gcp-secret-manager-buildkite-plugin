@@ -38,6 +38,11 @@ Secret Accessor role for the secret being accessed (`roles/secretmanager.secretA
 
 An object defining the export variables names and the secret names which will populate the values.
 
+The secret names can be expressed:
+
+- using only the secret name: `{secret-name}`
+- using a fully qualified name: `projects/{project-id-or-number}/secrets/{secret-name}/versions/{version}` (if the `/versions/{version}` is not included, the `latest` version will be used)
+
 ## Developing
 
 To run the tests:
