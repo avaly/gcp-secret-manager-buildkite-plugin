@@ -38,6 +38,8 @@ Secret Accessor role for the secret being accessed (`roles/secretmanager.secretA
 ### `env` (object)
 
 An object defining the export variables names and the secret names which will populate the values.
+The secret names can be fully qualified names in the form of `projects/{project-id-or-number}/secrets/{secret-name}/versions/{version}`.
+`/versions/{version}` is optional. If not part of the fully quailified name the `/versions/latest` will be used.
 
 ## Developing
 
