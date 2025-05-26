@@ -46,6 +46,7 @@ function load_secret_into_env() {
   # Redact secrets (https://buildkite.com/docs/agent/v3/cli-redactor) was added
   # in https://github.com/buildkite/agent/releases/tag/v3.66.0)
   echo "Redacting secret in Buildkite logs"
+  set +x # let's play safe and disable command tracing
   if ! echo "${secret_value}" | buildkite-agent redactor add ; then
     echo "Secret could not be redacted in Buildkite logs. Please ensure the Buildkite agent redactor is configured correctly."
   fi
