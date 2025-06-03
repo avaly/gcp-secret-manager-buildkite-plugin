@@ -7,8 +7,7 @@ setup() {
   # export GCLOUD_STUB_DEBUG=/dev/tty
 
   stub which \
-    "gcloud : echo /test/gcloud" \
-    "jq : echo /test/jq"
+    "gcloud : echo /test/gcloud"
 }
 
 teardown() {
