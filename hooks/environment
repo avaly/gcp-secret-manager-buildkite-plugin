@@ -44,15 +44,18 @@ function load_secret_into_env() {
 function get_secret_value() {
   local secret_name="$1"
   local secret_value
+  # Create a temporary directory with both BSD and GNU mktemp
+  TMPDIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'buildkiteXXXX')
+  local SECRETS_TMP_FILE="$TMPDIR"/secrets.tmp
 
-  secret_value=$(gcloud secrets versions access latest \
-    --secret="${secret_name}" \
-    --format='get(payload.data)' | tr '_-' '/+' | base64 -d)
-
+  gcloud secrets versions access latest --secret="${secret_name}" --out-file="${SECRETS_TMP_FILE}"
+  secret_value=$(<"${SECRETS_TMP_FILE}")
   result=$?
   if [[ $result -ne 0 ]]; then
+    rm "${SECRETS_TMP_FILE}"
     exit 1
   fi
+  rm "${SECRETS_TMP_FILE}"
 
   echo "${secret_value}"
 }
