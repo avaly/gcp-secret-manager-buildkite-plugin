@@ -6,13 +6,13 @@ services:
       - ".:/plugin:ro"
 
   lint:
-    image: buildkite/plugin-linter
+    image: buildkite/plugin-linter:v2.1.0
     command: ['--id', 'avaly/gcp-secret-manager']
     volumes:
       - ".:/plugin:ro"
 
   shellcheck:
-    image: koalaman/shellcheck-alpine:latest
+    image: koalaman/shellcheck-alpine:v0.10.0
     command: ['shellcheck', '/plugin/hooks/environment']
     volumes:
       - ".:/plugin:ro"
