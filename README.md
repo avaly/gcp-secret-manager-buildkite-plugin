@@ -10,7 +10,6 @@ Buildkite Agent machines.
 Other preinstalled requirements:
 
 - [`gcloud`](https://cloud.google.com/sdk/)
-- [`jq`](https://stedolan.github.io/jq/)
 
 ## Example
 

@@ -14,18 +14,11 @@ function initialize() {
   local result;
   local path;
 
+  # shellcheck disable=SC2034
   path=$(which gcloud)
   result=$?
   if [[ $result -ne 0 ]]; then
     echo "gcloud binary is not available in \$PATH"
-    exit 1
-  fi
-
-  # shellcheck disable=SC2034
-  path=$(which jq)
-  result=$?
-  if [[ $result -ne 0 ]]; then
-    echo "jq binary is not available in \$PATH"
     exit 1
   fi
 

@@ -3,7 +3,6 @@ description: Read secrets from Google Cloud Secret Manager
 author: https://github.com/avaly/gcp-secret-manager-buildkite-plugin
 requirements:
   - gcloud
-  - jq
 configuration:
   properties:
     credentials_file:
