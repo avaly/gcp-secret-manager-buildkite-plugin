@@ -29,6 +29,17 @@ function initialize() {
   initialized="1"
 }
 
+# Redact secrets (https://buildkite.com/docs/agent/v3/cli-redactor) was added
+# in https://github.com/buildkite/agent/releases/tag/v3.66.0)
+function redact_secret() {
+  local secret_value="$1"
+
+  echo "Redacting secret in Buildkite logs"
+  if ! echo "${secret_value}" | buildkite-agent redactor add ; then
+    echo "Warning: Buildkite agent redactor is not configured. Secrets will not be redacted in logs."
+  fi
+}
+
 function load_secret_into_env() {
   local export_name="$1"
   local secret_name="$2"
@@ -36,13 +47,7 @@ function load_secret_into_env() {
 
   secret_value="$(get_secret_value "${secret_name}")"
 
-  # Redact secrets (https://buildkite.com/docs/agent/v3/cli-redactor) was added
-  # in https://github.com/buildkite/agent/releases/tag/v3.66.0)
-  echo "Redacting secret in Buildkite logs"
-  set +x # let's play safe and disable command tracing
-  if ! echo "${secret_value}" | buildkite-agent redactor add ; then
-    echo "Secret could not be redacted in Buildkite logs. Please ensure the Buildkite agent redactor is configured correctly."
-  fi
+  redact_secret "${secret_value}"
 
   echo "Exporting secret ${secret_name} from GCP Secret Manager into environment variable ${export_name}"
 
