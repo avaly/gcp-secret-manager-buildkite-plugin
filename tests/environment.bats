@@ -5,12 +5,21 @@ setup() {
 
   # Uncomment to enable stub debugging
   # export GCLOUD_STUB_DEBUG=/dev/tty
+  export BUILDKITE_AGENT_STUB_DEBUG=/dev/tty
+  export ECHO_STUB_DEBUG=/dev/tty
 
   stub which \
     "gcloud : echo /test/gcloud"
+
+  stub buildkite-agent \
+    'exit 0'
+
+  stub echo \
+    'exit 0'
 }
 
 teardown() {
+  unstub buildkite-agent
   unstub gcloud
   unstub which
 }
@@ -44,6 +53,7 @@ environment_hook="$PWD/hooks/environment"
   assert_success
   assert_output --partial "Exporting secret secret1 from GCP Secret Manager into environment variable TARGET1"
   assert_output --partial "Exporting secret secret2 from GCP Secret Manager into environment variable TARGET2"
+  assert_output --partial "Redacting secret in Buildkite logs"
 
   unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_CREDENTIALS_FILE
   unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1
@@ -141,4 +151,27 @@ environment_hook="$PWD/hooks/environment"
   assert_equal $TARGET1 "test-value1"
 
   unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1
+}
+
+@test "Supports non redacted" {
+  export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_CREDENTIALS_FILE="/tmp/credentials.json"
+  export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1="secret1"
+
+  stub gcloud "auth activate-service-account --key-file /tmp/credentials.json : "
+  stub_gcloud_secrets
+  stub buildkite-agent \
+      'exit 1'
+  stub echo \
+      'exit 1'
+
+  run "${environment_hook}"
+
+  assert_success
+  assert_output --partial "Exporting secret secret1 from GCP Secret Manager into environment variable TARGET1"
+  assert_output --partial "Redacting secret in Buildkite logs"
+
+  unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_CREDENTIALS_FILE
+  unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1
+
+  unstub buildkite-agent
 }
