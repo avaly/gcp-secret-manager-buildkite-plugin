@@ -5,14 +5,11 @@ setup() {
 
   # Uncomment to enable stub debugging
   # export GCLOUD_STUB_DEBUG=/dev/tty
-  export BUILDKITE_AGENT_STUB_DEBUG=/dev/tty
-  export ECHO_STUB_DEBUG=/dev/tty
+  # export BUILDKITE_AGENT_STUB_DEBUG=/dev/tty
+  # export ECHO_STUB_DEBUG=/dev/tty
 
   stub which \
     "gcloud : echo /test/gcloud"
-
-  stub buildkite-agent \
-    'exit 0'
 
   stub echo \
     'exit 0'
@@ -38,6 +35,12 @@ function stub_gcloud_secrets_fqn() {
     "secrets versions access projects/${project}/secrets/SECRET_NAME2/versions/1 --secret=SECRET_NAME2 '--format=get(payload.data)' : echo 'dGVzdC12YWx1ZTI='"
 }
 
+function stub_buildkite_agent() {
+  stub buildkite-agent \
+    'exit 0' \
+    'exit 0'
+}
+
 environment_hook="$PWD/hooks/environment"
 
 @test "Exports values from GCP Secret Manager into env - output" {
@@ -45,6 +48,7 @@ environment_hook="$PWD/hooks/environment"
   export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1="secret1"
   export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET2="secret2"
 
+  stub_buildkite_agent
   stub gcloud "auth activate-service-account --key-file /tmp/credentials.json : "
   stub_gcloud_secrets
 
@@ -53,26 +57,9 @@ environment_hook="$PWD/hooks/environment"
   assert_success
   assert_output --partial "Exporting secret secret1 from GCP Secret Manager into environment variable TARGET1"
   assert_output --partial "Exporting secret secret2 from GCP Secret Manager into environment variable TARGET2"
-  assert_output --partial "Redacting secret in Buildkite logs"
-
-  unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_CREDENTIALS_FILE
-  unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1
-  unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET2
-}
-
-@test "Fetches values from GCP Secret Manager into env - variables" {
-  export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_CREDENTIALS_FILE="/tmp/credentials.json"
-  export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1="secret1"
-  export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET2="secret2"
-
-  stub gcloud "auth activate-service-account --key-file /tmp/credentials.json : "
-  stub_gcloud_secrets
-
-  # Using `run` will not populate these variables in the current shell
-  source "${environment_hook}"
-
-  assert_equal $TARGET1 "test-value1"
-  assert_equal $TARGET2 "test-value2"
+  assert_output --partial "Redacting secret in Buildkite logs for TARGET1"
+  assert_output --partial "Redacting secret in Buildkite logs for TARGET2"
+  refute_output --partial 'Warning: Buildkite agent redactor is not configured'
 
   unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_CREDENTIALS_FILE
   unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1
@@ -83,6 +70,7 @@ environment_hook="$PWD/hooks/environment"
   export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1="secret1"
   export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET2="secret2"
 
+  stub_buildkite_agent
   stub_gcloud_secrets
 
   run "${environment_hook}"
@@ -90,6 +78,9 @@ environment_hook="$PWD/hooks/environment"
   assert_success
   assert_output --partial "Exporting secret secret1 from GCP Secret Manager into environment variable TARGET1"
   assert_output --partial "Exporting secret secret2 from GCP Secret Manager into environment variable TARGET2"
+  assert_output --partial "Redacting secret in Buildkite logs for TARGET1"
+  assert_output --partial "Redacting secret in Buildkite logs for TARGET2"
+  refute_output --partial 'Warning: Buildkite agent redactor is not configured'
 
   unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1
   unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET2
@@ -99,6 +90,7 @@ environment_hook="$PWD/hooks/environment"
   export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1="secret1"
   export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET2="secret2"
 
+  stub_buildkite_agent
   stub_gcloud_secrets
 
   # Using `run` will not populate these variables in the current shell
@@ -114,6 +106,7 @@ environment_hook="$PWD/hooks/environment"
 @test "Supports fully qualified names without version" {
   export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1="projects/test-project/secrets/SECRET_NAME1"
 
+  stub_buildkite_agent
   stub_gcloud_secrets_fqn test-project
 
   # Using `run` will not populate these variables in the current shell
@@ -128,6 +121,7 @@ environment_hook="$PWD/hooks/environment"
   export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1="projects/test-project/secrets/SECRET_NAME1/versions/latest"
   export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET2="projects/test-project/secrets/SECRET_NAME2/versions/1"
 
+  stub_buildkite_agent
   stub_gcloud_secrets_fqn test-project
 
   # Using `run` will not populate these variables in the current shell
@@ -143,6 +137,7 @@ environment_hook="$PWD/hooks/environment"
 @test "Supports fully qualified names with project number" {
   export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1="projects/01726654/secrets/SECRET_NAME1"
 
+  stub_buildkite_agent
   stub_gcloud_secrets_fqn 01726654
 
   # Using `run` will not populate these variables in the current shell
@@ -168,10 +163,9 @@ environment_hook="$PWD/hooks/environment"
 
   assert_success
   assert_output --partial "Exporting secret secret1 from GCP Secret Manager into environment variable TARGET1"
-  assert_output --partial "Redacting secret in Buildkite logs"
+  assert_output --partial "Buildkite agent redactor is not configured. The value for TARGET1 will not be redacted in logs"
+  refute_output --partial "Redacting secret in Buildkite logs for TARGET1"
 
   unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_CREDENTIALS_FILE
   unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1
-
-  unstub buildkite-agent
 }

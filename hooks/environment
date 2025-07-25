@@ -35,9 +35,10 @@ function redact_secret() {
   local secret_value="$1"
   local export_name="$2"
 
-  echo "Redacting secret in Buildkite logs for ${export_name}"
-  if ! echo "${secret_value}" | buildkite-agent redactor add ; then
-    echo "Warning: Buildkite agent redactor is not configured. Secrets will not be redacted in logs."
+  if echo "${secret_value}" | buildkite-agent redactor add ; then
+    echo "Redacting secret in Buildkite logs for ${export_name}"
+  else
+    echo "Warning: Buildkite agent redactor is not configured. The value for ${export_name} will not be redacted in logs."
   fi
 }
 
