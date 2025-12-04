@@ -6,7 +6,7 @@ services:
       - ".:/plugin:ro"
 
   lint:
-    image: buildkite/plugin-linter:v2.1.0
+    image: buildkite/plugin-linter:v3.0.0
     command: ['--id', 'avaly/gcp-secret-manager']
     volumes:
       - ".:/plugin:ro"
