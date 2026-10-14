@@ -12,7 +12,7 @@ services:
       - ".:/plugin:ro"
 
   shellcheck:
-    image: koalaman/shellcheck-alpine:v0.10.0
+    image: koalaman/shellcheck-alpine:v0.11.0
     command: ['shellcheck', '/plugin/hooks/environment']
     volumes:
       - ".:/plugin:ro"
