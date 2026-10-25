@@ -39,6 +39,14 @@ function load_secret_into_env() {
   echo "Exporting secret ${secret_name} from GCP Secret Manager into environment variable ${export_name}"
 
   export "${export_name}=${secret_value}"
+
+  # Redact secrets (https://buildkite.com/docs/agent/v3/cli-redactor) was added
+  # in https://github.com/buildkite/agent/releases/tag/v3.66.0)
+  if echo "${secret_value}" | buildkite-agent redactor add --log-level warn ; then
+    echo "Redacting secret in Buildkite logs for ${export_name}"
+  else
+    echo "Warning: Buildkite agent redactor is not configured. The value for ${export_name} will not be redacted in logs."
+  fi
 }
 
 function get_secret_value() {
