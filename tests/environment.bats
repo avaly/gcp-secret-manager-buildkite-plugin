@@ -66,6 +66,26 @@ environment_hook="$PWD/hooks/environment"
   unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET2
 }
 
+@test "Fetches values from GCP Secret Manager into env - variables" {
+  export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_CREDENTIALS_FILE="/tmp/credentials.json"
+  export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1="secret1"
+  export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET2="secret2"
+
+  stub_buildkite_agent
+  stub gcloud "auth activate-service-account --key-file /tmp/credentials.json : "
+  stub_gcloud_secrets
+
+  # Using `run` will not populate these variables in the current shell
+  source "${environment_hook}"
+
+  assert_equal $TARGET1 "test-value1"
+  assert_equal $TARGET2 "test-value2"
+
+  unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_CREDENTIALS_FILE
+  unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1
+  unset BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET2
+}
+
 @test "Exports values from GCP Secret Manager into env via Application Default Credentials - output" {
   export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET1="secret1"
   export BUILDKITE_PLUGIN_GCP_SECRET_MANAGER_ENV_TARGET2="secret2"
